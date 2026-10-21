@@ -4,9 +4,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.chains.retrieval import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 st.set_page_config(page_title="Smart Document Detective", page_icon="🔍", layout="wide")
 
@@ -14,7 +13,6 @@ st.title("🔍 Smart Document Detective - RAG Analyzer")
 st.caption("Investigative AI Engine powered by LangChain, ChromaDB & LLMs | Built by NomaanOS-Dev")
 
 openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
-
 uploaded_file = st.sidebar.file_uploader("Upload Legal/Technical Document (PDF)", type="pdf")
 
 if uploaded_file and openai_api_key:
@@ -51,18 +49,22 @@ if uploaded_file and openai_api_key:
     ])
     
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
     
     user_query = st.text_input("Enter your query or investigation point:")
     if user_query:
         with st.spinner("Analyzing document evidence..."):
-            response = rag_chain.invoke({"input": user_query})
+            # Direct retrieval and execution via LCEL
+            retrieved_docs = retriever.invoke(user_query)
+            context_text = "\n\n".join([doc.page_content for doc in retrieved_docs])
+            
+            chain = prompt | llm | StrOutputParser()
+            answer = chain.invoke({"context": context_text, "input": user_query})
+            
             st.write("### Investigation Findings:")
-            st.write(response["answer"])
+            st.write(answer)
             
             with st.expander("Retrieved Document Evidence (Context)"):
-                for idx, doc in enumerate(response["context"]):
+                for idx, doc in enumerate(retrieved_docs):
                     st.markdown(f"**Evidence Chunk {idx+1}:**")
                     st.write(doc.page_content)
 else:
