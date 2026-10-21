@@ -1,5 +1,7 @@
 # 🔍 Smart Document Detective
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nomaanos-dev.streamlit.app/)
+
 An advanced **AI-powered Retrieval-Augmented Generation (RAG)** application engineered for high-precision technical, legal, and forensic document analysis.
 
 Developed by **[NomaanOS-Dev](https://github.com/NomaanOS-Dev)**.
@@ -18,7 +20,7 @@ Developed by **[NomaanOS-Dev](https://github.com/NomaanOS-Dev)**.
 ## 🛠️ Tech Stack
 
 * **Language:** Python 3.x
-* **Orchestration Framework:** LangChain / LangChain Community
+* **Orchestration Framework:** LangChain / LangChain Community & LCEL
 * **LLM Engine:** OpenAI `gpt-4o-mini`
 * **Vector Database:** ChromaDB
 * **UI Framework:** Streamlit
